@@ -12,3 +12,7 @@ def brown_spot_dir():
 
 def bacterial_leaf_blight_dir():
     return "C:/Users/MSI-GF63/Downloads/rice_leaf_diseases/Bacterial_leaf_blight"
+
+
+def all_states_dir():
+    return "C:/Users/MSI-GF63/Downloads/rice_leaf_diseases"
