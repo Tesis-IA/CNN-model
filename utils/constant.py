@@ -14,5 +14,13 @@ def bacterial_leaf_blight_dir():
     return "C:/Users/MSI-GF63/Downloads/rice_leaf_diseases/Bacterial_leaf_blight"
 
 
-def all_states_dir():
+def all_states_training_dir():
     return "C:/Users/MSI-GF63/Downloads/rice_leaf_diseases"
+
+
+def all_states_test_dir():
+    return "C:/Users/MSI-GF63/Downloads/rice_leaf_diseases"
+
+
+def get_test_image():
+    return "C:/Users/MSI-GF63/Downloads/rice_leaf_diseases/Bacterial_leaf_blight/DSC_0370.jpg"
