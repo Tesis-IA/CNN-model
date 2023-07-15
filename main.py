@@ -122,4 +122,6 @@ history = model.fit(
     epochs=100,
     verbose=1)
 
-model.save(utils.constant.all_states_test_dir() + "rice_model")
+print(train_generator.class_indices)
+
+model.save(utils.constant.all_states_test_dir() + "rice_model.h5")
