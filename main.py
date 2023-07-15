@@ -1,9 +1,7 @@
-# Get training data
 import os.path
 import tensorflow as tf
 import utils.constant
-from tensorflow.keras.optimizers import RMSprop
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from keras.preprocessing.image import ImageDataGenerator
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
@@ -54,6 +52,37 @@ for i, img_path in enumerate(next_healthy_pix + next_leaf_smut_pix + next_brown_
 
 plt.show()
 
+# Preprocessing the Training Data
+
+# All images will be rescaled by 1./255
+train_datagen = ImageDataGenerator(rescale=1 / 255,
+                                   shear_range=0.2,
+                                   zoom_range=0.2,
+                                   horizontal_flip=True
+                                   )
+
+# Flow training images in batches of 128 using train_datagen generator
+train_generator = train_datagen.flow_from_directory(
+    utils.constant.all_states_training_dir(),  # This is the source directory for training images
+    target_size=(300, 300),  # All images will be resized to 150x150
+    batch_size=129,
+    # Since we use binary_crossentropy loss, we need binary labels
+    class_mode='categorical'
+)
+
+
+# Preprocessing the Test Data
+
+test_datagen = ImageDataGenerator(rescale=1. / 255)
+
+test_generator = test_datagen.flow_from_directory(
+    utils.constant.all_states_test_dir(),
+    target_size=(300, 300),
+    batch_size=128,
+    class_mode='categorical'
+)
+
+
 model = tf.keras.models.Sequential([
     # Note the input shape is the desired size of the image 300x300 with 3 bytes color
     # This is the first convolution
@@ -75,30 +104,24 @@ model = tf.keras.models.Sequential([
     tf.keras.layers.Flatten(),
     # 512 neuron hidden layer
     tf.keras.layers.Dense(512, activation='relu'),
-    # Only 1 output neuron. It will contain a value from 0-1 where 0 for 1 class ('horses') and 1 for the other (
-    # 'humans')
-    tf.keras.layers.Dense(1, activation='sigmoid')
+    # Only 4 output neuron.
+    tf.keras.layers.Dense(4, activation='sigmoid')
 ])
 
 model.summary()
 
 model.compile(loss='binary_crossentropy',
-              optimizer=RMSprop(learning_rate=0.001),
-              metrics=['acc'])
+              optimizer='adam',
+              metrics=['acc']
+              )
 
-# All images will be rescaled by 1./255
-train_datagen = ImageDataGenerator(rescale=1. / 255)
-
-# Flow training images in batches of 128 using train_datagen generator
-train_generator = train_datagen.flow_from_directory(
-    utils.constant.all_states_dir(),  # This is the source directory for training images
-    target_size=(300, 300),  # All images will be resized to 150x150
-    batch_size=16,
-    # Since we use binary_crossentropy loss, we need binary labels
-    class_mode='binary')
 
 history = model.fit(
-    train_generator,
-    steps_per_epoch=8,
-    epochs=15,
+    x=train_generator,
+    validation_data=test_generator,
+    epochs=100,
     verbose=1)
+
+print(train_generator.class_indices)
+
+model.save(utils.constant.all_states_test_dir() + "rice_model.h5")
